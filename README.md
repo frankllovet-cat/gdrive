@@ -29,6 +29,55 @@ both ways.
   `--conflict-resolve`/`--resilient`/`--recover` around then; v1.75+ recommended).
 - A Google account.
 
+## Google setup (one time)
+
+You need your own OAuth client id/secret — rclone's shared one is being
+retired. All of this happens once, in the Google Cloud Console, before you touch
+rclone.
+
+### 1. Create a project and enable the Drive API
+
+1. Open <https://console.cloud.google.com/> and create a project (or pick an
+   existing one).
+2. Go to **APIs & Services → Library**, search for **Google Drive API**, open it
+   and click **Enable**.
+
+### 2. Configure the OAuth consent screen
+
+1. Go to **APIs & Services → OAuth consent screen**.
+2. **User type: External** → **Create**.
+3. Fill in **App name**, **User support email** and **Developer contact
+   information** (your own address is fine).
+4. **Scopes:** you can skip this step — rclone requests the Drive scope at login.
+5. **Test users:** add your own Google address (required while the app is in
+   *Testing*).
+6. **Save**.
+
+### 3. Create the OAuth client
+
+1. Go to **APIs & Services → Credentials**.
+2. **+ Create credentials → OAuth client ID**.
+3. **Application type: Desktop app**; give it any name.
+4. Copy the **Client ID** and **Client secret** — you'll paste them into
+   `rclone config` below.
+
+### 4. Publish the app (recommended)
+
+While the app is in **Testing**, Google expires the login token after **~7
+days**, so you'd have to re-authenticate every week. To avoid that, publish it:
+
+1. On **OAuth consent screen → Audience**, click **Publish app** → **Confirm**.
+2. If the button is greyed out, fill in **Branding** first — an **Application
+   home page** URL, an **Application privacy policy** link, and **Authorized
+   domains** (any URLs you control; a free GitHub Pages site is fine) — then
+   **Save** and return to **Audience**.
+
+The app stays **unverified**: when you log in you'll see a *"Google hasn't
+verified this app"* screen — click **Advanced → Go to … (unsafe)**. That's
+expected and fine for personal use; verification is only needed for public apps.
+
+---
+
 ## Setup
 
 ### 1. Install rclone
@@ -38,16 +87,9 @@ sudo -v && curl https://rclone.org/install.sh | sudo bash
 rclone version    # want v1.75.x or newer
 ```
 
-### 2. Create an OAuth remote
+### 2. Create an OAuth remote in rclone
 
-rclone's shared client id is being retired, so create your own OAuth client:
-
-1. In Google Cloud Console → APIs & Services → **Credentials**, create an
-   **OAuth client ID** of type **Desktop app**. (Enable the Drive API first.)
-2. If prompted, configure the OAuth consent screen; you can leave the app in
-   *Testing* and add your own address under **Audience → Test users**.
-
-Then:
+Using the **Client ID** and **Client secret** from the [Google setup](#google-setup-one-time) above:
 
 ```bash
 rclone config
