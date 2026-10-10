@@ -5,6 +5,9 @@ A single shell script + cron gives you a self-hosted "Google Drive for Desktop"
 experience: whichever side has the **newer** file wins, and deletions propagate
 both ways.
 
+> **In a hurry?** See **[HOWTO.md](HOWTO.md)** for the two-minute version of both
+> approaches (mirror and mount). This README is the full reference.
+
 ```
  local folder  <—— newer wins / deletions ——>  Google Drive
 ```
