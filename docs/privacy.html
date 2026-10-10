@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — gdrive</title>
+  <meta name="description" content="Privacy policy for gdrive, a self-hosted two-way Google Drive sync tool.">
+  <style>
+    :root { color-scheme: light dark; }
+    body { max-width: 40rem; margin: 3rem auto; padding: 0 1.2rem;
+           font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.15rem; margin-top: 1.8rem; }
+    a { color: inherit; }
+    footer { margin-top: 3rem; color: #888; font-size: .9rem; }
+    code { background: rgba(127,127,127,.15); padding: .1em .35em; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <p><em>Last updated: 2026</em></p>
+
+  <p>
+    <code>gdrive</code> ("the app", "the tool") is a self-hosted, open-source
+    command-line utility that synchronises a local folder with the user's own
+    Google Drive account, using the Google Drive API through
+    <a href="https://rclone.org/">rclone</a>. It is run by the user on the
+    user's own computer(s). There is no server operated by the developer, and
+    no data is transmitted to the developer.
+  </p>
+
+  <h2>What Google user data the app accesses</h2>
+  <p>
+    With the user's explicit consent (the OAuth authorisation screen), the app
+    requests the Google Drive scope
+    <code>https://www.googleapis.com/auth/drive</code>. This allows the app to
+    read, create, modify and delete files and folders in the Google Drive
+    account the user authorises. The app only accesses the files and folders
+    that the user chooses to synchronise.
+  </p>
+
+  <h2>How the data is used</h2>
+  <p>
+    The Google Drive data is used for one purpose only: to keep the user's
+    chosen local folder and their Google Drive synchronised — downloading files
+    that are newer or missing locally, and uploading files that are newer or
+    missing in Drive. No Google user data is used for advertising, profiling,
+    analytics, or any other purpose.
+  </p>
+
+  <h2>How the data is stored and shared</h2>
+  <ul>
+    <li>
+      File content moves only between the user's own computer(s) and the user's
+      own Google Drive account, at the user's direction. It is never sent to the
+      developer or to any third party.
+    </li>
+    <li>
+      The OAuth credentials (client ID, client secret and access/refresh tokens)
+      are stored locally on the user's own machine, in the rclone configuration
+      file, readable only by the user's account.
+    </li>
+    <li>
+      The app includes no analytics, telemetry, tracking, or crash reporting.
+    </li>
+    <li>
+      The developer has no access to, and does not collect, receive, store or
+      process, any of the user's Google user data.
+    </li>
+  </ul>
+
+  <h2>Data retention and deletion</h2>
+  <p>
+    Because the app runs entirely on the user's own machine and the data stays
+    in the user's Google Drive, the user is in full control of retention:
+  </p>
+  <ul>
+    <li>Delete files in Google Drive or locally at any time; the next sync propagates the change.</li>
+    <li>Remove the locally stored credentials by deleting the relevant rclone remote (<code>rclone config delete &lt;name&gt;</code>).</li>
+    <li>Revoke the app's access at any time from the Google account's
+      <a href="https://myaccount.google.com/permissions">Security → Third-party apps</a> page.</li>
+  </ul>
+
+  <h2>Limited Use disclosure</h2>
+  <p>
+    The app's use of information received from Google APIs adheres to the
+    <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>,
+    including the Limited Use requirements. Google user data is used only to
+    provide the synchronisation feature, is not transferred to third parties
+    except as necessary to provide that feature, is not used for advertising,
+    and is not read by humans except with the user's explicit consent or as
+    required by law.
+  </p>
+
+  <h2>Children</h2>
+  <p>The app is not directed at children and does not knowingly collect data from anyone.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>
+    This policy may be updated from time to time. Material changes will be
+    reflected on this page with an updated date.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    For any questions about this policy, open an issue at
+    <a href="https://github.com/frankllovet-cat/gdrive/issues">github.com/frankllovet-cat/gdrive/issues</a>.
+  </p>
+
+  <footer>
+    <a href="index.html">Home</a>
+  </footer>
+</body>
+</html>
