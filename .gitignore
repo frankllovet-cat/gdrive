@@ -1,0 +1,6 @@
+# Never commit credentials or logs
+*.log
+*.log.*
+client_secret*.json
+secret.google
+.env
