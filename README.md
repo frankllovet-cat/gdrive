@@ -197,6 +197,97 @@ Flags used by the script:
   - `~/gdrive-bisync.log` (rotated to `…log.1.gz` at 10 MB)
   - `~/.cache/rclone/bisync/` — per-machine baseline listings
 
+## Alternative approach: mount (stream files on demand)
+
+`rclone bisync` (above) keeps a full local copy. If you'd rather **not** store
+everything locally and instead fetch files/folders only when you open them —
+like Google Drive's "Stream files" mode — use `rclone mount`, which presents the
+remote as a local folder backed by FUSE.
+
+Requirements: FUSE (`fuse3` on Debian/Ubuntu → `sudo apt install fuse3`).
+
+### Quick mount
+
+```bash
+mkdir -p ~/Drive
+rclone mount gdrive: ~/Drive \
+  --vfs-cache-mode writes \
+  --vfs-cache-max-size 2G \
+  --vfs-cache-max-age 24h \
+  --vfs-read-chunk-size 32M \
+  --vfs-read-chunk-size-limit 128M \
+  --dir-cache-time 1h \
+  --poll-interval 0 \
+  --drive-skip-gdocs \
+  --daemon
+```
+
+Unmount with `fusermount3 -u ~/Drive`. To mount only a subfolder, use
+`gdrive:SomeFolder` instead of `gdrive:`.
+
+### Keep it mounted at boot (systemd `--user`)
+
+`~/.config/systemd/user/gdrive-mount.service`:
+
+```ini
+[Unit]
+Description=Mount Google Drive (rclone)
+After=network-online.target
+
+[Service]
+Type=notify
+ExecStartPre=/bin/mkdir -p %h/Drive
+ExecStart=/usr/bin/rclone mount gdrive: %h/Drive \
+  --vfs-cache-mode writes --vfs-cache-max-size 2G --vfs-cache-max-age 24h \
+  --vfs-read-chunk-size 32M --vfs-read-chunk-size-limit 128M \
+  --dir-cache-time 1h --poll-interval 0 --drive-skip-gdocs
+ExecStop=/bin/fusermount3 -u %h/Drive
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now gdrive-mount.service
+loginctl enable-linger "$USER"     # start at boot without logging in
+```
+
+### Flag choices (and why)
+
+| Flag | Default | Tuned | Why |
+| ---- | ------- | ----- | --- |
+| `--vfs-cache-max-size` | off (unlimited) | `2G` | cap the disk cache so it can't fill the disk |
+| `--vfs-read-chunk-size-limit` | off (unlimited) | `128M` | bound readahead memory while streaming large files |
+| `--vfs-read-chunk-size` | 128M | `32M` | less RAM per open file |
+| `--dir-cache-time` | 5m | `1h` | fewer listing API calls, snappier navigation |
+| `--poll-interval` | 1m | `0` | no background polling (saves quota/battery); folders refresh when their cache expires |
+| `--vfs-cache-mode` | off | `writes` | allow open→edit→save through the mount (`off` = read-only streaming, `full` = also cache reads) |
+| `--drive-skip-gdocs` | — | on | native Google Docs can't be opened via a mount; hide them instead of showing broken 0-byte files |
+
+Leave `--drive-pacer-*` at their defaults — Drive rate-limits aggressively and
+tightening the pacer just causes `403`s.
+
+### Mount vs mirror
+
+| | `bisync` (mirror) | `rclone mount` (stream) |
+| --- | --- | --- |
+| Local disk | full copy | cache only |
+| When fetched | all up front | on demand |
+| Offline | yes | no (except cached) |
+| Good for | backup, offline | browsing, streaming, low disk |
+
+### Caveats
+
+- Needs network to open anything not yet cached; first open has latency.
+- New remote files can take up to `--dir-cache-time` to appear. Lower it (e.g.
+  `30m`) if you add files from other devices often.
+- Native Google Docs/Sheets/Slides won't open (no real size) — same reason the
+  mirror approach skips them.
+- It's **not a backup** — deleting in the mount deletes in Drive.
+- Don't mount inside the `bisync` folder (`~/gdrive`); keep the two separate.
+
 ## Troubleshooting
 
 - `another sync is already running - skipping` — normal; a previous run is
